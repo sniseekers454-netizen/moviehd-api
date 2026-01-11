@@ -9,6 +9,15 @@ print("🚀 M3U8 API running")
 print("📡 Endpoint: GET /api/m3u8?url=")
 
 
+@app.route("/")
+def home():
+    return jsonify({
+        "status": "ok",
+        "service": "moviehd m3u8 api",
+        "endpoint": "/api/m3u8?url="
+    })
+
+
 @app.route("/api/m3u8", methods=["GET"])
 def api_m3u8():
     video_url = request.args.get("url")
@@ -34,5 +43,5 @@ def api_m3u8():
     })
 
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+# ❌ DO NOT use app.run() on Render
+# Gunicorn runs the app for you
