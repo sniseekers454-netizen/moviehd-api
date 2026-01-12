@@ -25,21 +25,26 @@ def api_m3u8():
     if not video_url:
         return jsonify({
             "status": "error",
-            "m3u8": None,
-            "message": "Missing ?url= parameter"
-        }), 200
+            "message": "Missing ?url= parameter",
+            "m3u8": None
+        }), 400
 
     result = get_m3u8(video_url)
 
-    if not result:
+    # 🔒 ALWAYS return JSON
+    if not result or not result.get("m3u8"):
         return jsonify({
             "status": "error",
-            "m3u8": None,
-            "message": "No m3u8 found"
+            "source_url": video_url,
+            "m3u8": None
         }), 200
 
     return jsonify({
         "status": "ok",
         "source_url": video_url,
-        **result
+        "m3u8": result["m3u8"]
     })
+
+
+# ❌ DO NOT use app.run()
+# Gunicorn runs this on Render
