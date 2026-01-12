@@ -5,7 +5,7 @@ async def capture_m3u8(url):
     async with async_playwright() as p:
         browser = await p.chromium.launch(
             headless=True,
-            channel="chromium",   # 🔑 IMPORTANT
+            channel="chromium",
             args=[
                 "--no-sandbox",
                 "--disable-dev-shm-usage",
@@ -23,15 +23,20 @@ async def capture_m3u8(url):
 
         page.on("response", handle_response)
 
-await page.goto(url, wait_until="domcontentloaded", timeout=60000)
+        # ✅ correct load strategy for video sites
+        await page.goto(url, wait_until="domcontentloaded", timeout=60000)
 
-# ✅ wait until the video element exists
-await page.wait_for_selector("video", timeout=20000)
+        # ✅ wait until video player exists
+        await page.wait_for_selector("video", timeout=20000)
 
-# ✅ give the player time to request the stream
-await asyncio.sleep(12)
+        # ✅ allow stream requests to fire
+        await asyncio.sleep(12)
 
-
+        # 🔁 small retry window (extra safety)
+        for _ in range(3):
+            if m3u8_url:
+                break
+            await asyncio.sleep(3)
 
         await browser.close()
         return m3u8_url
