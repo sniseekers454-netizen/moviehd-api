@@ -30,11 +30,12 @@ def api_m3u8():
 
     result = get_m3u8(video_url)
 
-    if not result:
-        return jsonify({
-            "status": "error",
-            "message": "No m3u8 found"
-        }), 500
+if not result:
+    return jsonify({
+        "status": "error",
+        "m3u8": None,
+        "message": "No m3u8 found"
+    }), 200
 
     return jsonify({
         "status": "ok",

@@ -23,8 +23,15 @@ async def capture_m3u8(url):
 
         page.on("response", handle_response)
 
-        await page.goto(url, wait_until="networkidle", timeout=60000)
-        await asyncio.sleep(5)
+await page.goto(url, wait_until="domcontentloaded", timeout=60000)
+
+# ✅ wait until the video element exists
+await page.wait_for_selector("video", timeout=20000)
+
+# ✅ give the player time to request the stream
+await asyncio.sleep(12)
+
+
 
         await browser.close()
         return m3u8_url
